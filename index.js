@@ -21,22 +21,32 @@ const client = new MongoClient(uri, {
   },
 });
 
-// app.get("/", (req, res) => {
-//   res.send("Server Running");
-// });
-const db = client.db("B12-A10-Habit-Tracker-DB");
-const productsCollection = db.collection("habits");
-
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+    const db = client.db("B12-A10-Habit-Tracker-DB");
+    const productsCollection = db.collection("habits");
     // ----------------------------------------------------------------
     // --------------    MongoDB API            -----------------------
     // ----------------------------------------------------------------
     app.post("/habits", async (req, res) => {
       const NewData = req.body;
       const result = await productsCollection.insertOne(NewData);
+      res.send(result);
+    });
+
+    // Get 8 Data for Home Page
+    app.get("/recent-habit", async (req, res) => {
+      const cursor = productsCollection.find().sort();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // Get All Data for Public-Habit Page
+    app.get("/public-habits", async (req, res) => {
+      const cursor = productsCollection.find();
+      const result = await cursor.toArray();
       res.send(result);
     });
 
