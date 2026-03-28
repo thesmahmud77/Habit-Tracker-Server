@@ -26,6 +26,7 @@ const client = new MongoClient(uri, {
 // });
 const db = client.db("B12-A10-Habit-Tracker-DB");
 const productsCollection = db.collection("habits");
+const habitCollection = db.collection("my-habits");
 
 async function run() {
   try {
@@ -37,6 +38,29 @@ async function run() {
     app.post("/habits", async (req, res) => {
       const NewData = req.body;
       const result = await productsCollection.insertOne(NewData);
+      res.send(result);
+    });
+
+    // Get all Data for public-Habits Section
+    app.get("/habits", async (req, res) => {
+      const cursor = productsCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // Get 6 Data for Home page
+    app.get("/recent-habits", async (req, res) => {
+      const cursor = productsCollection
+        .find()
+        .sort({ postCreateTime: -1 })
+        .limit(6);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.post("/my-habits", async (req, res) => {
+      const NewData = req.body;
+      const result = await habitCollection.insertOne(NewData);
       res.send(result);
     });
 
