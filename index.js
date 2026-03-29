@@ -60,7 +60,21 @@ async function run() {
 
     app.post("/my-habits", async (req, res) => {
       const NewData = req.body;
+      const alreadyExist = await habitCollection.findOne({
+        id: NewData.id,
+        userEmail: NewData.userEmail,
+      });
+
+      if (alreadyExist) {
+        return res.send({ message: "Already added!" });
+      }
       const result = await habitCollection.insertOne(NewData);
+      res.send(result);
+    });
+
+    app.get("/my-habits", async (req, res) => {
+      const carsor = habitCollection.find();
+      const result = await carsor.toArray();
       res.send(result);
     });
 
