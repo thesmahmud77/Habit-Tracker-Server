@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 3000;
@@ -75,6 +75,21 @@ async function run() {
     app.get("/my-habits", async (req, res) => {
       const carsor = habitCollection.find();
       const result = await carsor.toArray();
+      res.send(result);
+    });
+
+    app.get("/my-habits/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await habitCollection.findOne(filter);
+      res.send(result);
+    });
+
+    app.patch("/my-habits/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = { $set: { currentStatus: req.body.currentStatus } };
+      const result = await habitCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
 
